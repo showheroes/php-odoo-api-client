@@ -6,6 +6,7 @@ use Ang3\Component\Odoo\Exception\RemoteException;
 use Ang3\Component\Odoo\Exception\RequestException;
 use Ang3\Component\XmlRpc\Client as XmlRpcClient;
 use Ang3\Component\XmlRpc\Exception\RemoteException as XmlRpcRemoteException;
+use Ang3\Component\XmlRpc\Transport\TransportInterface;
 use Throwable;
 
 class Endpoint
@@ -20,10 +21,10 @@ class Endpoint
      */
     private $client;
 
-    public function __construct(string $url)
+    public function __construct(string $url, TransportInterface $transport = null, array $rpcClientOptions = [])
     {
         $this->url = $url;
-        $this->client = new XmlRpcClient($url);
+        $this->client = new XmlRpcClient($url, $transport, $rpcClientOptions);
     }
 
     /**

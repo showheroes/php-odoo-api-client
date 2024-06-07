@@ -129,10 +129,10 @@ class Client
     /**
      * Create a new record.
      *
-     * @throws InvalidArgumentException when $data is empty
+     * @return int the ID of the new record
      * @throws RequestException         when request failed
      *
-     * @return int the ID of the new record
+     * @throws InvalidArgumentException when $data is empty
      */
     public function create(string $modelName, array $data): int
     {
@@ -140,7 +140,7 @@ class Client
             throw new InvalidArgumentException('Data cannot be empty');
         }
 
-        return (int) $this->call($modelName, OrmQuery::CREATE, [$data]);
+        return (int)$this->call($modelName, OrmQuery::CREATE, [$data]);
     }
 
     /**
@@ -152,9 +152,9 @@ class Client
      */
     public function read(string $modelName, $ids, array $options = []): array
     {
-        $ids = [is_int($ids) ? [$ids] : (array) $ids];
+        $ids = [is_int($ids) ? [$ids] : (array)$ids];
 
-        return (array) $this->call($modelName, OrmQuery::READ, $ids, $options);
+        return (array)$this->call($modelName, OrmQuery::READ, $ids, $options);
     }
 
     /**
@@ -170,7 +170,7 @@ class Client
             return;
         }
 
-        $this->call($modelName, OrmQuery::WRITE, [(array) $ids, $data]);
+        $this->call($modelName, OrmQuery::WRITE, [(array)$ids, $data]);
     }
 
     /**
@@ -182,7 +182,7 @@ class Client
      */
     public function delete(string $modelName, $ids): void
     {
-        $ids = is_array($ids) ? $ids : [(int) $ids];
+        $ids = is_array($ids) ? $ids : [(int)$ids];
         $this->call($modelName, OrmQuery::UNLINK, [$ids]);
     }
 
@@ -203,10 +203,10 @@ class Client
     /**
      * Search all ID of record(s) with options.
      *
-     * @throws InvalidArgumentException when $criteria value is not valid
+     * @return array<int>
      * @throws RequestException         when request failed
      *
-     * @return array<int>
+     * @throws InvalidArgumentException when $criteria value is not valid
      */
     public function searchAll(string $modelName, array $options = []): array
     {
@@ -218,10 +218,10 @@ class Client
     /**
      * Find ID of record(s) by criteria and options.
      *
-     * @throws InvalidArgumentException when $criteria value is not valid
+     * @return array<int>
      * @throws RequestException         when request failed
      *
-     * @return array<int>
+     * @throws InvalidArgumentException when $criteria value is not valid
      */
     public function search(string $modelName, iterable $criteria = null, array $options = []): array
     {
@@ -229,7 +229,7 @@ class Client
             unset($options['fields']);
         }
 
-        return (array) $this->call($modelName, OrmQuery::SEARCH, $this->expr()->normalizeDomains($criteria), $options);
+        return (array)$this->call($modelName, OrmQuery::SEARCH, $this->expr()->normalizeDomains($criteria), $options);
     }
 
     /**
@@ -260,9 +260,9 @@ class Client
     /**
      * Find all record(s) with options.
      *
+     * @return array<int, array>
      * @throws RequestException when request failed
      *
-     * @return array<int, array>
      */
     public function findAll(string $modelName, array $options = []): array
     {
@@ -272,14 +272,14 @@ class Client
     /**
      * Find record(s) by criteria and options.
      *
-     * @throws InvalidArgumentException when $criteria value is not valid
+     * @return array<int, array>
      * @throws RequestException         when request failed
      *
-     * @return array<int, array>
+     * @throws InvalidArgumentException when $criteria value is not valid
      */
     public function findBy(string $modelName, iterable $criteria = null, array $options = []): array
     {
-        return (array) $this->call($modelName, OrmQuery::SEARCH_READ, $this->expr()->normalizeDomains($criteria), $options);
+        return (array)$this->call($modelName, OrmQuery::SEARCH_READ, $this->expr()->normalizeDomains($criteria), $options);
     }
 
     /**
@@ -290,8 +290,8 @@ class Client
     public function exists(string $modelName, int $id): bool
     {
         return 1 === $this->count($modelName, [
-            'id' => $id,
-        ]);
+                'id' => $id,
+            ]);
     }
 
     /**
@@ -313,7 +313,7 @@ class Client
      */
     public function count(string $modelName, iterable $criteria = null): int
     {
-        return (int) $this->call($modelName, OrmQuery::SEARCH_COUNT, $this->expr()->normalizeDomains($criteria));
+        return (int)$this->call($modelName, OrmQuery::SEARCH_COUNT, $this->expr()->normalizeDomains($criteria));
     }
 
     /**
@@ -323,7 +323,7 @@ class Client
      */
     public function listFields(string $modelName, array $options = []): array
     {
-        return (array) $this->call($modelName, self::LIST_FIELDS, [], $options);
+        return (array)$this->call($modelName, self::LIST_FIELDS, [], $options);
     }
 
     /**
@@ -478,7 +478,12 @@ class Client
      */
     private function initEndpoints(): void
     {
-        $this->commonEndpoint = new Endpoint($this->url.'/'.self::ENDPOINT_COMMON);
-        $this->objectEndpoint = new Endpoint($this->url.'/'.self::ENDPOINT_OBJECT);
+        $this->commonEndpoint = $this->initSingleEndpoint($this->url . '/' . self::ENDPOINT_COMMON);
+        $this->objectEndpoint = $this->initSingleEndpoint($this->url . '/' . self::ENDPOINT_OBJECT);
+    }
+
+    protected function initSingleEndpoint(string $path): Endpoint
+    {
+        return new Endpoint($path);
     }
 }
